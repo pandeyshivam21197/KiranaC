@@ -1,17 +1,14 @@
-import {IRadioButton} from '../../../components/atoms/radioButtonList';
-
-export interface IUserInfo {
-  name?: string;
-  surname?: string;
-  gender?: string;
-  info?: string;
-  id?: number;
+export interface IHeadline {
+  title: string;
+  description: string;
+  urlToImage: string;
+  content: string;
 }
+
+export type IHeadinesById = Record<number, IHeadline>;
 
 export interface IHomeScreenState {
-  users: IUsers;
-  userForAddOrUpdate?: IUserInfo;
-  genderRadioButton: IRadioButton[];
+  headinesById: IHeadinesById;
+  pinnedHeadlineIds: number[];
+  displayedHealineIds: number[];
 }
-
-export type IUsers = Record<number, IUserInfo>;

@@ -1,84 +1,103 @@
-import {IRadioButton} from '../../../components/atoms/radioButtonList';
-import {IHomeScreenState, IUserInfo} from './interfaces';
-import {createSlice} from '@reduxjs/toolkit';
-
-const genderRadioButtons: IRadioButton[] = [
-  {key: 'M', value: 'Male', isSelected: false},
-  {key: 'F', value: 'Female', isSelected: false},
-];
+import { IReducerAction } from "../../../common/interfaces";
+import { IHeadinesById, IHomeScreenState } from "./interfaces";
+import { createSlice } from "@reduxjs/toolkit";
 
 export const initialState: IHomeScreenState = {
-  users: {}, //by id reducer
-  userForAddOrUpdate: {},
-  genderRadioButton: [...genderRadioButtons],
+  pinnedHeadlineIds: [], //by id reducer
+  displayedHealineIds: [],
+  headinesById: {},
 };
-
-const setGenderRadioButton = (
-  radioButtons: IRadioButton[],
-  userDetails: IUserInfo,
-) => {
-  return radioButtons.map(radioButton => {
-    if (radioButton?.key === userDetails.gender) {
-      return {...radioButton, isSelected: true};
-    }
-
-    if (radioButton?.isSelected) {
-      return {...radioButton, isSelected: false};
-    }
-
-    return radioButton;
-  });
-};
-
-// type HomeActionPayloadTypes = IUserInfo | string;
 
 export const homeReducerSlice = createSlice({
-  name: 'homeReducer',
+  name: "homeReducer",
   initialState,
   reducers: {
-    addUserAction: state => {
-      if (!state.userForAddOrUpdate) {
+    setHeadlinesById: (state, action: IReducerAction<IHeadinesById>) => {
+      state.headinesById = {
+        ...state.headinesById,
+        ...action.payload,
+      };
+    },
+    setDisplayedHeadlineIds: (state, action: IReducerAction<number[]>) => {
+      if (!action.payload) {
         return state;
       }
 
-      const uniqueId = Math.random() * 100;
+      const updatedHeadlinesByIds = { ...state.headinesById };
 
-      state.users[uniqueId] = {...state.userForAddOrUpdate, id: uniqueId};
+      if (Object.keys(state.headinesById).length) {
+        //remove displayed headlines
+        action.payload.forEach((id: number) => {
+          if (updatedHeadlinesByIds[id]) {
+            delete updatedHeadlinesByIds[id];
+          }
+        });
+      }
 
-      state.userForAddOrUpdate = undefined;
-      state.genderRadioButton = initialState.genderRadioButton;
+      //set new set of displayed headlines
+      state.displayedHealineIds = action.payload as number[];
+    },
+    addHeadlineToPinnned: (state, action: IReducerAction<number>) => {
+      //remove from by id headlines and
+      //add headline id to pinned at top of []
+
+      if (!action.payload) {
+        return state;
+      }
+
+      const updatedDisplayedIds = state.displayedHealineIds.filter(
+        (id) => id !== action.payload
+      );
+
+      const updatedPinnedHeadlineIds = [...state.pinnedHeadlineIds];
+      updatedPinnedHeadlineIds.unshift(action.payload as number);
+
+      state.pinnedHeadlineIds = updatedPinnedHeadlineIds;
+      state.displayedHealineIds = updatedDisplayedIds;
 
       return state;
     },
-    updateUserDetails: (state, action) => {
-      const userDetails: IUserInfo = action?.payload;
+    deleteHeadline: (state, action: IReducerAction<number>) => {
+      const updatedHeadlinesById = { ...state.headinesById };
 
-      const isOldUser = !!userDetails?.id;
+      if (!action.payload) {
+        return state;
+      }
 
-      if (isOldUser) {
-        state.users[userDetails?.id as number] = {
-          ...userDetails,
-        };
+      let updatedDisplayedIds = state.displayedHealineIds;
+      let updatedPinnedIds = state.pinnedHeadlineIds;
 
-        state.genderRadioButton = setGenderRadioButton(
-          state.genderRadioButton,
-          userDetails,
+      if (state.displayedHealineIds.includes(action.payload)) {
+        updatedDisplayedIds = state.displayedHealineIds.filter(
+          (id) => id !== action.payload
         );
       }
 
-      state.userForAddOrUpdate = userDetails;
+      if (state.pinnedHeadlineIds.includes(action.payload)) {
+        updatedPinnedIds = state.pinnedHeadlineIds.filter(
+          (id) => id !== action.payload
+        );
+      }
+
+      delete updatedHeadlinesById[action.payload as number];
+
+      state.headinesById = updatedHeadlinesById;
+      state.displayedHealineIds = updatedDisplayedIds;
+      state.pinnedHeadlineIds = updatedPinnedIds;
 
       return state;
+      //remove headline from headinesById
     },
-    updateGenderRadioButtons: (state, action) => {
-      const genderRadioButton: IRadioButton[] = action?.payload;
+    removeHeadlineFromPinned: (state, action: IReducerAction<number>) => {
+      //remove headline id from pinned
+      if (!action.payload) {
+        return state;
+      }
+      const updatedPinnedHeadlineIds: number[] = state.pinnedHeadlineIds.filter(
+        (id: number) => id !== action.payload
+      );
 
-      state.genderRadioButton = genderRadioButton;
-
-      return state;
-    },
-    resetGenderRadioButtons: state => {
-      state.genderRadioButton = initialState.genderRadioButton;
+      state.pinnedHeadlineIds = updatedPinnedHeadlineIds;
 
       return state;
     },
@@ -86,10 +105,11 @@ export const homeReducerSlice = createSlice({
 });
 
 export const {
-  addUserAction,
-  updateUserDetails,
-  updateGenderRadioButtons,
-  resetGenderRadioButtons,
+  setHeadlinesById,
+  setDisplayedHeadlineIds,
+  deleteHeadline,
+  addHeadlineToPinnned,
+  removeHeadlineFromPinned,
 } = homeReducerSlice.actions;
 
 export default homeReducerSlice.reducer;
