@@ -1,4 +1,3 @@
-import { useDispatch } from "react-redux";
 import { IReducerAction } from "../../../common/interfaces";
 import { getRandomHeadlineIds } from "../../../utils/homeUtils";
 import { IHeadlinesById, IHomeScreenState } from "./interfaces";
