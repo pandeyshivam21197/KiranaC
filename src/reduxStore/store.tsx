@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2";
 import homeReducer from "./reducers/homeReducer";
-import persistReducer from "redux-persist/es/persistReducer";
+import { persistReducer } from "redux-persist";
 import thunk from "redux-thunk";
 
 const middlewares = [thunk];
