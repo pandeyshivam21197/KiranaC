@@ -5,10 +5,10 @@ export interface IHeadline {
   content: string;
 }
 
-export type IHeadinesById = Record<number, IHeadline>;
+export type IHeadlinesById = Record<string, IHeadline>;
 
 export interface IHomeScreenState {
-  headinesById: IHeadinesById;
-  pinnedHeadlineIds: number[];
-  displayedHealineIds: number[];
+  headlinesById: IHeadlinesById;
+  pinnedHeadlineIds: string[];
+  displayedHealineIds: string[];
 }

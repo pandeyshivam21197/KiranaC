@@ -1,16 +1,16 @@
-import axios, {AxiosRequestConfig, AxiosInstance} from 'axios';
-import {responseInterceptors} from './interceptors';
+import axios, { AxiosRequestConfig, AxiosInstance } from "axios";
+import { responseInterceptors } from "./interceptors";
 
 class ApiClient {
   apiclient: AxiosInstance;
 
   constructor() {
     let axiosInstance = axios.create({
-      baseURL: 'https://dummyjson.com/',
+      baseURL: "https://newsapi.org",
       timeout: 600000,
     });
 
-    const {onRejected, onResponse} = responseInterceptors();
+    const { onRejected, onResponse } = responseInterceptors();
 
     axiosInstance.interceptors.response.use(onResponse, onRejected);
 
@@ -26,7 +26,7 @@ class ApiClient {
 
   get = (url: string, params = {}): any => {
     return this.request({
-      method: 'GET',
+      method: "GET",
       url,
       params,
     });
@@ -35,4 +35,4 @@ class ApiClient {
 
 const apiClient = new ApiClient();
 
-export {apiClient as ApiClient};
+export { apiClient as ApiClient };

@@ -1,16 +1,21 @@
-import React, { FC, useEffect, useMemo } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { useAppSelector } from "../../../reduxStore/hooks";
 import { shallowEqual, useDispatch } from "react-redux";
-import { screenDimension } from "../../../utils/dimensionUtils";
 import { HeadlineCard, IHeadlineCardProps } from "../../molecules/headlineCard";
 import { setDisplayedHeadlineIds } from "../../../reduxStore/reducers/homeReducer";
+import Loader from "../../atoms/loader";
+import { fetchFreshHeadlines } from "../../../reduxStore/actions/homeActions";
 
 export const HeadlineCardList: FC<any> = () => {
   const dispatch = useDispatch();
 
-  const headlineIds = useAppSelector((state) => {
-    const headlineKeys = Object.keys(state.homeReducer.headinesById);
+  const page = useRef(1);
+
+  const [laoding, setLoading] = useState(false);
+
+  const headlineIds: string[] = useAppSelector((state) => {
+    const headlineKeys = Object.keys(state.homeReducer.headlinesById);
 
     return headlineKeys;
   }, shallowEqual);
@@ -39,33 +44,65 @@ export const HeadlineCardList: FC<any> = () => {
   const getKeyForExtractor = (item: number, index: number): string =>
     `${item || index}`;
 
-  const getRandomHeadlineIds = () => {
-    //TODO: Shivam get randorm ids from headlineIds
+  const onRefresh = () => {
+    dispatch(setDisplayedHeadlineIds());
   };
 
-  const onRefresh = () => {
-    const randomHeadlineIds = getRandomHeadlineIds();
+  const hasHeadlines = headlineIds.length > 0;
 
-    dispatch(setDisplayedHeadlineIds(randomHeadlineIds));
+  const isLessHeadlinesLeft = headlineIds.length <= 20;
+
+  const fetchHeadlines = async () => {
+    setLoading(true);
+
+    const callback = () => {
+      setLoading(false);
+
+      page.current = page.current + 1;
+    };
+
+    //@ts-ignore
+    dispatch(fetchFreshHeadlines(page.current, callback));
   };
 
   useEffect(() => {
-    //TODO: Fetch the data from api if not there else get from async storage
-  }, []);
+    if (!hasHeadlines || isLessHeadlinesLeft) {
+      //Due to dev account contraint can only access 100 records only.
+      fetchHeadlines();
+    }
+  }, [isLessHeadlinesLeft]);
+
+  useEffect(() => {
+    if (hasHeadlines) {
+      const intervalId: number = setInterval(() => {
+        onRefresh();
+      }, 10000);
+
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [hasHeadlines]);
+
+  if (!hasHeadlines) {
+    return <Loader />;
+  }
 
   return (
-    <View style={styles.userList}>
-      <FlatList
-        data={pinnedAndDisplayedHealineIds}
-        renderItem={renderHeadline}
-        keyExtractor={getKeyForExtractor}
-      />
-    </View>
+    <FlatList
+      data={pinnedAndDisplayedHealineIds}
+      renderItem={renderHeadline}
+      keyExtractor={getKeyForExtractor}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      refreshControl={
+        <RefreshControl refreshing={laoding} onRefresh={onRefresh} />
+      }
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  userList: {
-    height: screenDimension.height / 1.5,
+  separator: {
+    height: 24,
   },
 });

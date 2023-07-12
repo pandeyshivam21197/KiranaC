@@ -4,8 +4,12 @@ import Text from "../../atoms/text";
 import Image from "../../atoms/image";
 import Button from "../../atoms/button";
 import { useAppSelector } from "../../../reduxStore/hooks";
-import { shallowEqual } from "react-redux";
+import { shallowEqual, useDispatch } from "react-redux";
 import { IHeadline } from "../../../reduxStore/reducers/homeReducer/interfaces";
+import {
+  addHeadlineToPinnned,
+  deleteHeadline,
+} from "../../../reduxStore/reducers/homeReducer";
 
 export interface IHeadlineCardProps {
   id: number;
@@ -14,27 +18,37 @@ export interface IHeadlineCardProps {
 const HeadlineCard: FC<IHeadlineCardProps> = (props): React.ReactElement => {
   const { id } = props;
 
+  const dispatch = useDispatch();
+
   const headline: IHeadline = useAppSelector((state) => {
-    const headline = state.homeReducer.headinesById[id];
+    const headline = state.homeReducer.headlinesById[id];
+
+    console.log(headline, "headline");
 
     return headline;
-  });
+  }, shallowEqual);
+
+  if (!headline) {
+    return null;
+  }
 
   const onPin = () => {
-    //TODO: Shivam
+    dispatch(addHeadlineToPinnned(id));
   };
 
   const onDelete = () => {
-    //TODO: Shivam
+    dispatch(deleteHeadline(id));
   };
 
   const { urlToImage, title, description, content } = headline;
 
   return (
     <View style={styles.container}>
-      <Image style={styles.headlineImage} source={{ uri: urlToImage }} />
+      {urlToImage && (
+        <Image style={styles.headlineImage} source={{ uri: urlToImage }} />
+      )}
       <View style={styles.rowContainer}>
-        <Text>{title}</Text>
+        <Text style={styles.title}>{title}</Text>
         <View style={styles.rowContainer}>
           <Button title="pin" onPress={onPin} />
           <Button title="delete" onPress={onDelete} />
@@ -55,12 +69,17 @@ const styles = StyleSheet.create({
   },
   headlineImage: {
     flex: 1,
-    height: 400,
+    height: 200,
+    width: "100%",
   },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
+    marginTop: 20,
+  },
+  title: {
+    width: "70%",
   },
 });
 
