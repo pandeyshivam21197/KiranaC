@@ -23,8 +23,6 @@ const HeadlineCard: FC<IHeadlineCardProps> = (props): React.ReactElement => {
   const headline: IHeadline = useAppSelector((state) => {
     const headline = state.homeReducer.headlinesById[id];
 
-    console.log(headline, "headline");
-
     return headline;
   }, shallowEqual);
 

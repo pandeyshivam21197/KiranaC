@@ -2,7 +2,7 @@ import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { useAppSelector } from "../../../reduxStore/hooks";
 import { shallowEqual, useDispatch } from "react-redux";
-import { HeadlineCard, IHeadlineCardProps } from "../../molecules/headlineCard";
+import { HeadlineCard } from "../../molecules/headlineCard";
 import { setDisplayedHeadlineIds } from "../../../reduxStore/reducers/homeReducer";
 import Loader from "../../atoms/loader";
 import { fetchFreshHeadlines } from "../../../reduxStore/actions/homeActions";
