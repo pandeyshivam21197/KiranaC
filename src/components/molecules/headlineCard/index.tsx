@@ -10,6 +10,7 @@ import {
   addHeadlineToPinnned,
   deleteHeadline,
 } from "../../../reduxStore/reducers/homeReducer";
+import { imagePaths } from "../../../assets/images";
 
 export interface IHeadlineCardProps {
   id: number;
@@ -64,6 +65,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
+    backgroundColor: "grey",
+    marginVertical: 24,
   },
   headlineImage: {
     flex: 1,

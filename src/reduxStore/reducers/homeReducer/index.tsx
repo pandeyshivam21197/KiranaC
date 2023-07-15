@@ -4,9 +4,9 @@ import { IHeadlinesById, IHomeScreenState } from "./interfaces";
 import { createSlice } from "@reduxjs/toolkit";
 
 export const initialState: IHomeScreenState = {
-  pinnedHeadlineIds: [], //by id reducer
+  pinnedHeadlineIds: [],
   displayedHealineIds: [],
-  headlinesById: {},
+  headlinesById: {}, //by id reducer
 };
 
 export const homeReducerSlice = createSlice({
@@ -37,7 +37,9 @@ export const homeReducerSlice = createSlice({
       ) {
         //remove prev displayed headlines
         state.displayedHealineIds.forEach((id: string) => {
-          if (updatedHeadlinesByIds[id]) {
+          const isInPinned = state.pinnedHeadlineIds.includes(id);
+
+          if (updatedHeadlinesByIds[id] && !isInPinned) {
             delete updatedHeadlinesByIds[id];
           }
         });

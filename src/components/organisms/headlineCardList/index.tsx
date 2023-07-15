@@ -1,14 +1,16 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
+import { RefreshControl, SectionList, StyleSheet } from "react-native";
 import { useAppSelector } from "../../../reduxStore/hooks";
 import { shallowEqual, useDispatch } from "react-redux";
 import { HeadlineCard } from "../../molecules/headlineCard";
 import { setDisplayedHeadlineIds } from "../../../reduxStore/reducers/homeReducer";
 import Loader from "../../atoms/loader";
+import Text from "../../atoms/text";
 import { fetchFreshHeadlines } from "../../../reduxStore/actions/homeActions";
 
 export const HeadlineCardList: FC<any> = () => {
   const dispatch = useDispatch();
+  const refreshTimerRef = useRef<number>();
 
   const page = useRef(1);
 
@@ -32,11 +34,6 @@ export const HeadlineCardList: FC<any> = () => {
     return displayedKeys;
   }, shallowEqual);
 
-  const pinnedAndDisplayedHealineIds = useMemo(
-    () => [...pinnedHealineIds, ...displayedHealineIds],
-    [pinnedHealineIds, displayedHealineIds]
-  );
-
   const renderHeadline = ({ item }: { item: number }) => {
     return <HeadlineCard id={item} />;
   };
@@ -46,6 +43,18 @@ export const HeadlineCardList: FC<any> = () => {
 
   const onRefresh = () => {
     dispatch(setDisplayedHeadlineIds());
+  };
+
+  const onPullToRefresh = () => {
+    if (refreshTimerRef.current) {
+      clearInterval(refreshTimerRef.current);
+    }
+
+    onRefresh();
+
+    refreshTimerRef.current = setInterval(() => {
+      onRefresh();
+    }, 10000);
   };
 
   const hasHeadlines = headlineIds.length > 0;
@@ -74,12 +83,14 @@ export const HeadlineCardList: FC<any> = () => {
 
   useEffect(() => {
     if (hasHeadlines) {
-      const intervalId: number = setInterval(() => {
+      refreshTimerRef.current = setInterval(() => {
         onRefresh();
       }, 10000);
 
       return () => {
-        clearInterval(intervalId);
+        if (refreshTimerRef.current) {
+          clearInterval(refreshTimerRef.current as number);
+        }
       };
     }
   }, [hasHeadlines]);
@@ -88,21 +99,46 @@ export const HeadlineCardList: FC<any> = () => {
     return <Loader />;
   }
 
+  const pinnedSection = {
+    title: "Pinned Headlines:",
+    data: pinnedHealineIds,
+  };
+
+  const randomSection = {
+    title: "Random Headlines:",
+    data: displayedHealineIds,
+  };
+
+  const sectionData = [];
+
+  if (pinnedHealineIds && pinnedHealineIds?.length) {
+    sectionData.push(pinnedSection);
+  }
+
+  if (displayedHealineIds && displayedHealineIds?.length) {
+    sectionData.push(randomSection);
+  }
+
   return (
-    <FlatList
-      data={pinnedAndDisplayedHealineIds}
-      renderItem={renderHeadline}
-      keyExtractor={getKeyForExtractor}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
+    <SectionList
+      sections={sectionData}
+      keyExtractor={(item, index) => {
+        return `${item} + ${index}`;
+      }}
       refreshControl={
-        <RefreshControl refreshing={laoding} onRefresh={onRefresh} />
+        <RefreshControl refreshing={laoding} onRefresh={onPullToRefresh} />
       }
+      renderItem={renderHeadline}
+      renderSectionHeader={({ section: { title } }) => {
+        return <Text>{title}</Text>;
+      }}
     />
   );
 };
 
 const styles = StyleSheet.create({
   separator: {
-    height: 24,
+    // height: 12,
+    // backgroundColor: "red",
   },
 });

@@ -9,8 +9,8 @@ export const fetchFreshHeadlines =
   (page: number, cb: () => void) => async (dispatch: AppDispatch) => {
     try {
       const res = await ApiClient.get(END_POINTS.topHeadlinea, {
-        country: "us",
         apiKey: "900f1dac5f3e4ab3984f45f0d2c61db5",
+        q: "nature",
         pageSize: 40,
         page,
       });

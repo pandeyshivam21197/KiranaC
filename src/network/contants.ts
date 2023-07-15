@@ -7,5 +7,5 @@ export enum API_METHODS {
 }
 
 export const END_POINTS = {
-  topHeadlinea: "v2/top-headlines",
+  topHeadlinea: "v2/everything",
 };
