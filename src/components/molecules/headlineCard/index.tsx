@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
+    color: "black",
   },
   content: {
     padding: 12,
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
   titleContainer: {},
   description: {
     marginTop: 20,
+    fontWeight: "400",
   },
   footer: {
     alignSelf: "flex-end",

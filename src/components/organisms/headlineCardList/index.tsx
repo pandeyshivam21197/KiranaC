@@ -173,5 +173,6 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 21,
     fontWeight: "700",
+    color: "black",
   },
 });
