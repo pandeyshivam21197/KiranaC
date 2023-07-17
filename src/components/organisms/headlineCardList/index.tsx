@@ -45,7 +45,9 @@ export const HeadlineCardList: FC<any> = () => {
     `${item || index}`;
 
   const onRefresh = () => {
-    scrollToSection(totalSections.current > 1 ? 1 : 0, 0);
+    if (totalSections.current) {
+      scrollToSection(totalSections.current > 1 ? 1 : 0, 0);
+    }
 
     dispatch(setDisplayedHeadlineIds());
   };
