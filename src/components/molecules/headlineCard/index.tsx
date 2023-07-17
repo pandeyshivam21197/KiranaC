@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { StyleSheet, View } from "react-native";
 import Text from "../../atoms/text";
 import Image from "../../atoms/image";
-import Button from "../../atoms/button";
 import { useAppSelector } from "../../../reduxStore/hooks";
 import { shallowEqual, useDispatch } from "react-redux";
 import { IHeadline } from "../../../reduxStore/reducers/homeReducer/interfaces";
