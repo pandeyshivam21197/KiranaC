@@ -51,7 +51,9 @@ const HeadlineCard: FC<IHeadlineCardProps> = (props): React.ReactElement => {
         <View style={[styles.rowContainer, styles.titleContainer]}>
           <Text style={styles.title}>{title}</Text>
         </View>
-        <Text style={styles.description}>{description}</Text>
+        <Text numberOfLines={3} style={styles.description}>
+          {description}
+        </Text>
         <View style={[styles.rowContainer, styles.footer]}>
           <View style={[styles.button, styles.deleteButton]}>
             <Icon
