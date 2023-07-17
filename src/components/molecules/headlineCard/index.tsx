@@ -53,11 +53,21 @@ const HeadlineCard: FC<IHeadlineCardProps> = (props): React.ReactElement => {
         </View>
         <Text style={styles.description}>{description}</Text>
         <View style={[styles.rowContainer, styles.footer]}>
-          <View style={styles.button}>
-            <Icon onPress={onPin} size={20} name={icons.pin} />
-          </View>
           <View style={[styles.button, styles.deleteButton]}>
-            <Icon onPress={onDelete} size={20} name={icons.delete} />
+            <Icon
+              color={"#d11a2a"}
+              onPress={onDelete}
+              size={20}
+              name={icons.delete}
+            />
+          </View>
+          <View style={styles.button}>
+            <Icon
+              color={"#7dc67d"}
+              onPress={onPin}
+              size={20}
+              name={icons.pin}
+            />
           </View>
         </View>
       </View>
