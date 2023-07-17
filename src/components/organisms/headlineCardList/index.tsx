@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { RefreshControl, SectionList, StyleSheet } from "react-native";
+import React, { FC, Ref, useEffect, useMemo, useRef, useState } from "react";
+import { RefreshControl, SectionList, StyleSheet, View } from "react-native";
 import { useAppSelector } from "../../../reduxStore/hooks";
 import { shallowEqual, useDispatch } from "react-redux";
 import { HeadlineCard } from "../../molecules/headlineCard";
@@ -7,12 +7,15 @@ import { setDisplayedHeadlineIds } from "../../../reduxStore/reducers/homeReduce
 import Loader from "../../atoms/loader";
 import Text from "../../atoms/text";
 import { fetchFreshHeadlines } from "../../../reduxStore/actions/homeActions";
+import { easeInEaseOutAnimation } from "../../../utils/animationUtils";
 
 export const HeadlineCardList: FC<any> = () => {
   const dispatch = useDispatch();
   const refreshTimerRef = useRef<number>();
 
   const page = useRef(1);
+  const sectionListRef = useRef<SectionList>(null);
+  const totalSections = useRef(0);
 
   const [laoding, setLoading] = useState(false);
 
@@ -42,6 +45,8 @@ export const HeadlineCardList: FC<any> = () => {
     `${item || index}`;
 
   const onRefresh = () => {
+    scrollToSection(totalSections.current > 1 ? 1 : 0, 0);
+
     dispatch(setDisplayedHeadlineIds());
   };
 
@@ -119,8 +124,29 @@ export const HeadlineCardList: FC<any> = () => {
     sectionData.push(randomSection);
   }
 
+  totalSections.current = sectionData.length;
+
+  const scrollToSection = (sectionIndex: number, itemIndex: 0) => {
+    if (!sectionListRef.current) {
+      return;
+    }
+
+    sectionListRef.current?.scrollToLocation({
+      sectionIndex: sectionIndex,
+      itemIndex: itemIndex,
+      animated: true,
+    });
+  };
+
+  const renderSeparator = () => <View style={styles.separator} />;
+
+  const renderSectionHeader = ({ section: { title } }): React.ReactElement => {
+    return <Text style={styles.sectionHeader}>{title}</Text>;
+  };
+
   return (
     <SectionList
+      ref={sectionListRef}
       sections={sectionData}
       keyExtractor={(item, index) => {
         return `${item} + ${index}`;
@@ -129,16 +155,23 @@ export const HeadlineCardList: FC<any> = () => {
         <RefreshControl refreshing={laoding} onRefresh={onPullToRefresh} />
       }
       renderItem={renderHeadline}
-      renderSectionHeader={({ section: { title } }) => {
-        return <Text>{title}</Text>;
-      }}
+      SectionSeparatorComponent={renderSeparator}
+      ItemSeparatorComponent={renderSeparator}
+      contentContainerStyle={styles.content}
+      renderSectionHeader={renderSectionHeader}
     />
   );
 };
 
 const styles = StyleSheet.create({
   separator: {
-    // height: 12,
-    // backgroundColor: "red",
+    height: 20,
+  },
+  content: {
+    paddingVertical: 16,
+  },
+  sectionHeader: {
+    fontSize: 21,
+    fontWeight: "700",
   },
 });

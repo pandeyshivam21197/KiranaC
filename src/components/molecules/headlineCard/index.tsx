@@ -10,7 +10,8 @@ import {
   addHeadlineToPinnned,
   deleteHeadline,
 } from "../../../reduxStore/reducers/homeReducer";
-import { imagePaths } from "../../../assets/images";
+import { Card } from "../../HOC/card";
+import { Icon, icons } from "../../atoms/Icon";
 
 export interface IHeadlineCardProps {
   id: number;
@@ -39,23 +40,28 @@ const HeadlineCard: FC<IHeadlineCardProps> = (props): React.ReactElement => {
     dispatch(deleteHeadline(id));
   };
 
-  const { urlToImage, title, description, content } = headline;
+  const { urlToImage, title, description } = headline;
 
   return (
-    <View style={styles.container}>
+    <Card style={styles.container}>
       {urlToImage && (
         <Image style={styles.headlineImage} source={{ uri: urlToImage }} />
       )}
-      <View style={styles.rowContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <View style={styles.rowContainer}>
-          <Button title="pin" onPress={onPin} />
-          <Button title="delete" onPress={onDelete} />
+      <View style={styles.content}>
+        <View style={[styles.rowContainer, styles.titleContainer]}>
+          <Text style={styles.title}>{title}</Text>
+        </View>
+        <Text style={styles.description}>{description}</Text>
+        <View style={[styles.rowContainer, styles.footer]}>
+          <View style={styles.button}>
+            <Icon onPress={onPin} size={20} name={icons.pin} />
+          </View>
+          <View style={[styles.button, styles.deleteButton]}>
+            <Icon onPress={onDelete} size={20} name={icons.delete} />
+          </View>
         </View>
       </View>
-      <Text>{description}</Text>
-      <Text>{content}</Text>
-    </View>
+    </Card>
   );
 };
 
@@ -65,22 +71,42 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: "grey",
-    marginVertical: 24,
+    margin: 4,
+    backgroundColor: "white",
+    borderRadius: 8,
   },
   headlineImage: {
     flex: 1,
     height: 200,
     width: "100%",
+    borderRadius: 8,
   },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginTop: 20,
+    alignItems: "center",
   },
   title: {
-    width: "70%",
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  content: {
+    padding: 12,
+  },
+  titleContainer: {},
+  description: {
+    marginTop: 20,
+  },
+  footer: {
+    alignSelf: "flex-end",
+    marginTop: 20,
+  },
+  deleteButton: {
+    marginLeft: 12,
+  },
+  button: {
+    alignItems: "flex-end",
+    width: 40,
   },
 });
 
